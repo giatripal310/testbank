@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Builder — TestBank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .inp { width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: .5rem .75rem; font-size: .875rem; background: #fff; color: #0f172a; font-family: inherit; transition: border-color .15s, box-shadow .15s; }
+    .inp:focus { outline: none; border-color: #4338ca; box-shadow: 0 0 0 3px rgba(67,56,202,.1); }
+    .field-label { display: block; font-size: .8125rem; font-weight: 500; color: #475569; margin-bottom: 5px; }
+    .sec-label { font-size: .6875rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; }
+    .q-row { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; transition: box-shadow .1s; cursor: pointer; }
+    .q-row:hover { box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    .q-row.selected { border-color: #a5b4fc; background: #eef2ff; }
+    .selected-row { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 8px; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+  <div id="nav"></div>
+
+  <div class="max-w-screen-xl mx-auto px-6 py-10">
+    <div class="flex items-center gap-3 mb-6">
+      <a href="tests.html" class="text-sm text-slate-400 hover:text-slate-600 transition-colors">← Back</a>
+      <h1 id="pageTitle" class="text-2xl font-bold text-slate-900 tracking-tight">Build a Test</h1>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+      <!-- Left: Test details + question picker -->
+      <div class="lg:col-span-3 space-y-5">
+
+        <!-- Test details -->
+        <div class="bg-white border border-slate-200 rounded-lg p-5">
+          <div class="sec-label">Test Details</div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+            <div>
+              <label class="field-label">Test Code *</label>
+              <input id="tCode" type="text" class="inp font-mono" placeholder="TEST-MATH-G3-001" />
+              <p class="text-xs text-slate-400 mt-1">Auto-generated · editable</p>
+            </div>
+            <div class="sm:col-span-2">
+              <label class="field-label">Test Title *</label>
+              <input id="tTitle" type="text" class="inp" placeholder="e.g. Grade 3 Math — Unit 2 Quiz" />
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="field-label">Subject</label>
+              <select id="tSubject" class="inp" onchange="updateCode()"><option value="">— none —</option></select>
+            </div>
+            <div>
+              <label class="field-label">Grade Level</label>
+              <select id="tGrade" class="inp" onchange="updateCode()"><option value="">— none —</option></select>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="field-label">Description</label>
+            <input id="tDesc" type="text" class="inp" placeholder="Optional short description" />
+          </div>
+          <div>
+            <label class="field-label">Instructions for Students</label>
+            <textarea id="tInstructions" rows="2" class="inp resize-y" placeholder="e.g. Answer all questions. Show your work for full credit."></textarea>
+          </div>
+        </div>
+
+        <!-- Question picker -->
+        <div class="bg-white border border-slate-200 rounded-lg p-5">
+          <div class="sec-label">Add Questions from Bank</div>
+          <div class="flex gap-2 mb-3">
+            <input id="qSearch" type="text" class="inp" placeholder="Search questions…" onkeydown="if(event.key==='Enter')searchQuestions()" />
+            <button onclick="searchQuestions()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded text-sm font-medium hover:bg-slate-200 transition-colors shrink-0">Search</button>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mb-3">
+            <select id="qfSubject" class="inp" onchange="searchQuestions()"><option value="">All subjects</option></select>
+            <select id="qfGrade" class="inp" onchange="searchQuestions()"><option value="">All grades</option></select>
+            <select id="qfType" class="inp" onchange="searchQuestions()"><option value="">All types</option></select>
+          </div>
+          <div id="qBankList" class="space-y-1.5 max-h-80 overflow-y-auto pr-1">
+            <p class="text-sm text-slate-400 text-center py-6">Search or filter to find questions</p>
+          </div>
+          <p class="text-xs text-slate-400 mt-2">Click a question to add it to your test.</p>
+        </div>
+      </div>
+
+      <!-- Right: Selected questions -->
+      <div class="lg:col-span-2">
+        <div class="bg-white border border-slate-200 rounded-lg p-5 sticky top-20">
+          <div class="flex items-center justify-between mb-4">
+            <div class="sec-label mb-0">Selected Questions</div>
+            <span id="qCount" class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">0</span>
+          </div>
+
+          <div id="selectedList" class="space-y-1.5 min-h-24 mb-5">
+            <p class="text-sm text-slate-400 text-center py-8">No questions added yet</p>
+          </div>
+
+          <div id="saveError" class="hidden mb-3 p-2.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded"></div>
+
+          <div class="space-y-2">
+            <button id="saveBtn" onclick="saveTest()"
+              class="w-full flex items-center justify-center gap-2 bg-indigo-700 text-white px-4 py-2.5 rounded text-sm font-semibold hover:bg-indigo-800 transition-colors disabled:opacity-60">
+              Save Test
+            </button>
+            <button onclick="previewTest()" id="previewBtn"
+              class="w-full flex items-center justify-center gap-2 border border-slate-200 text-slate-600 px-4 py-2.5 rounded text-sm font-medium hover:bg-slate-50 transition-colors disabled:opacity-40" disabled>
+              🖨️ Preview & Print
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script>
+    let selectedQuestions = []  // array of full question objects, ordered
+    let allBankQuestions  = []
+    let currentUser       = null
+    let editId            = null
+
+    async function init() {
+      currentUser = await requireAuth()
+      if (!currentUser) return
+      document.getElementById('nav').innerHTML = navHTML('tests.html')
+
+      // Populate filter dropdowns
+      const subj = document.getElementById('tSubject')
+      const qfs  = document.getElementById('qfSubject')
+      SUBJECTS.forEach(s => {
+        const o1 = document.createElement('option'); o1.value = s.value; o1.textContent = s.label; subj.appendChild(o1)
+        const o2 = document.createElement('option'); o2.value = s.value; o2.textContent = s.label; qfs.appendChild(o2)
+      })
+
+      const gradeSubj = document.getElementById('tGrade')
+      const qfg = document.getElementById('qfGrade')
+      GRADE_LEVELS.forEach(g => {
+        const o1 = document.createElement('option'); o1.value = g.value; o1.textContent = g.label; gradeSubj.appendChild(o1)
+        const o2 = document.createElement('option'); o2.value = g.value; o2.textContent = g.label; qfg.appendChild(o2)
+      })
+
+      const qft = document.getElementById('qfType')
+      QUESTION_TYPES.forEach(t => { const o = document.createElement('option'); o.value = t.value; o.textContent = t.label; qft.appendChild(o) })
+
+      // Edit mode?
+      const params = new URLSearchParams(window.location.search)
+      editId = params.get('id')
+      if (editId) {
+        document.getElementById('pageTitle').textContent = 'Edit Test'
+        await loadTest(editId)
+      }
+
+      await searchQuestions()
+    }
+
+    async function loadTest(id) {
+      const { data: t, error } = await db.from('tests').select('*').eq('id', id).single()
+      if (error || !t) { alert('Test not found'); window.location.href = 'tests.html'; return }
+
+      document.getElementById('tCode').value         = t.test_code
+      document.getElementById('tTitle').value        = t.title
+      document.getElementById('tDesc').value         = t.description || ''
+      document.getElementById('tInstructions').value = t.instructions || ''
+      if (t.subject)     document.getElementById('tSubject').value = t.subject
+      if (t.grade_level) document.getElementById('tGrade').value   = t.grade_level
+
+      if (t.question_ids?.length) {
+        const { data: qs } = await db.from('questions').select('*').in('id', t.question_ids).eq('is_active', true)
+        if (qs) {
+          // Restore original order
+          selectedQuestions = t.question_ids.map(id => qs.find(q => q.id === id)).filter(Boolean)
+          renderSelected()
+        }
+      }
+    }
+
+    async function searchQuestions() {
+      const search  = document.getElementById('qSearch').value.trim()
+      const subject = document.getElementById('qfSubject').value
+      const grade   = document.getElementById('qfGrade').value
+      const type    = document.getElementById('qfType').value
+
+      let query = db.from('questions')
+        .select('id,question_code,title,subject,grade_level,difficulty,question_type')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(50)
+
+      if (search)  query = query.or(`title.ilike.%${search}%,question_code.ilike.%${search}%`)
+      if (subject) query = query.eq('subject', subject)
+      if (grade)   query = query.eq('grade_level', grade)
+      if (type)    query = query.eq('question_type', type)
+
+      const { data } = await query
+      allBankQuestions = data || []
+      renderBank()
+    }
+
+    function renderBank() {
+      const selectedIds = new Set(selectedQuestions.map(q => q.id))
+      if (!allBankQuestions.length) {
+        document.getElementById('qBankList').innerHTML = '<p class="text-sm text-slate-400 text-center py-6">No questions found</p>'
+        return
+      }
+      document.getElementById('qBankList').innerHTML = allBankQuestions.map(q => `
+        <div class="q-row ${selectedIds.has(q.id) ? 'selected' : ''}" onclick="toggleQuestion('${q.id}')">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5 mb-0.5 flex-wrap">
+              <span class="font-mono text-xs text-slate-400">${q.question_code}</span>
+              ${subjectBadge(q.subject)}
+              ${difficultyBadge(q.difficulty)}
+            </div>
+            <p class="text-sm font-medium text-slate-800 truncate">${q.title}</p>
+            <p class="text-xs text-slate-400">${getTypeLabel(q.question_type)}</p>
+          </div>
+          <div class="shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center text-xs transition-all ${selectedIds.has(q.id) ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300'}">
+            ${selectedIds.has(q.id) ? '✓' : ''}
+          </div>
+        </div>`).join('')
+    }
+
+    async function toggleQuestion(id) {
+      const idx = selectedQuestions.findIndex(q => q.id === id)
+      if (idx >= 0) {
+        selectedQuestions.splice(idx, 1)
+      } else {
+        // Fetch full question if not already in selectedQuestions
+        let q = allBankQuestions.find(q => q.id === id)
+        if (!q) {
+          const { data } = await db.from('questions').select('*').eq('id', id).single()
+          q = data
+        }
+        if (q) selectedQuestions.push(q)
+      }
+      renderBank()
+      renderSelected()
+    }
+
+    function renderSelected() {
+      const count = selectedQuestions.length
+      document.getElementById('qCount').textContent = count
+      document.getElementById('previewBtn').disabled = count === 0
+
+      if (!count) {
+        document.getElementById('selectedList').innerHTML = '<p class="text-sm text-slate-400 text-center py-8">No questions added yet</p>'
+        return
+      }
+
+      document.getElementById('selectedList').innerHTML = selectedQuestions.map((q, i) => `
+        <div class="selected-row">
+          <div class="flex flex-col gap-0.5 shrink-0">
+            <button onclick="moveQ(${i}, -1)" ${i===0?'disabled':''} class="text-slate-300 hover:text-slate-600 disabled:opacity-30 text-xs leading-none">▲</button>
+            <button onclick="moveQ(${i},  1)" ${i===selectedQuestions.length-1?'disabled':''} class="text-slate-300 hover:text-slate-600 disabled:opacity-30 text-xs leading-none">▼</button>
+          </div>
+          <span class="text-xs text-slate-400 font-mono w-4 shrink-0">${i+1}</span>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-semibold text-slate-700 truncate">${q.title}</p>
+            <p class="text-xs text-slate-400">${q.question_code} · ${getTypeLabel(q.question_type)}</p>
+          </div>
+          <button onclick="toggleQuestion('${q.id}')" class="text-slate-300 hover:text-red-400 transition-colors text-sm shrink-0">✕</button>
+        </div>`).join('')
+    }
+
+    function moveQ(i, dir) {
+      const j = i + dir
+      if (j < 0 || j >= selectedQuestions.length) return
+      ;[selectedQuestions[i], selectedQuestions[j]] = [selectedQuestions[j], selectedQuestions[i]]
+      renderSelected()
+    }
+
+    async function updateCode() {
+      if (editId) return
+      const subject = document.getElementById('tSubject').value
+      const grade   = document.getElementById('tGrade').value
+      if (!subject && !grade) return
+      const prefix = 'TEST-' + (subject ? subject.replace('_','').slice(0,4).toUpperCase() + '-' : '') + (grade ? 'G' + grade + '-' : '')
+      const { data } = await db.from('tests').select('test_code').ilike('test_code', prefix + '%')
+      const nums = (data || []).map(r => parseInt(r.test_code.split('-').pop()) || 0)
+      const next = (Math.max(0, ...nums) + 1).toString().padStart(3, '0')
+      document.getElementById('tCode').value = prefix + next
+    }
+
+    async function saveTest() {
+      const btn   = document.getElementById('saveBtn')
+      const code  = document.getElementById('tCode').value.trim()
+      const title = document.getElementById('tTitle').value.trim()
+
+      if (!code || !title) { showSaveError('Test code and title are required.'); return }
+      if (!selectedQuestions.length) { showSaveError('Add at least one question.'); return }
+
+      btn.disabled = true; btn.textContent = 'Saving…'
+
+      const payload = {
+        test_code:    code.toUpperCase(),
+        title,
+        description:  document.getElementById('tDesc').value.trim(),
+        instructions: document.getElementById('tInstructions').value.trim(),
+        subject:      document.getElementById('tSubject').value || null,
+        grade_level:  document.getElementById('tGrade').value || null,
+        question_ids: selectedQuestions.map(q => q.id),
+        updated_by:   currentUser.id,
+      }
+
+      let error, savedId
+      if (editId) {
+        const res = await db.from('tests').update(payload).eq('id', editId).select().single()
+        error = res.error; savedId = editId
+      } else {
+        payload.created_by = currentUser.id
+        const res = await db.from('tests').insert(payload).select().single()
+        error = res.error; savedId = res.data?.id
+      }
+
+      if (error) { showSaveError(error.message); btn.disabled = false; btn.textContent = 'Save Test'; return }
+
+      // Redirect to print view
+      window.location.href = `test-view.html?id=${savedId}`
+    }
+
+    function previewTest() {
+      // Save to sessionStorage and open print preview without saving to DB yet
+      const code  = document.getElementById('tCode').value.trim()
+      const title = document.getElementById('tTitle').value.trim()
+      if (!title) { showSaveError('Enter a test title before previewing.'); return }
+      const preview = {
+        test_code:    code || 'PREVIEW',
+        title,
+        description:  document.getElementById('tDesc').value.trim(),
+        instructions: document.getElementById('tInstructions').value.trim(),
+        subject:      document.getElementById('tSubject').value || null,
+        grade_level:  document.getElementById('tGrade').value || null,
+        questions:    selectedQuestions,
+      }
+      sessionStorage.setItem('testPreview', JSON.stringify(preview))
+      window.open('test-view.html?preview=1', '_blank')
+    }
+
+    function showSaveError(msg) {
+      const el = document.getElementById('saveError')
+      el.textContent = msg; el.classList.remove('hidden')
+      setTimeout(() => el.classList.add('hidden'), 4000)
+    }
+
+    init()
+  </script>
+</body>
+</html>

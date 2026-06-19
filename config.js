@@ -109,7 +109,10 @@ function navHTML(active) {
   return `
   <nav style="background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:40;font-family:'Inter',system-ui,sans-serif">
     <div style="max-width:1280px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between">
-      <a href="dashboard.html" style="font-weight:700;color:#3730a3;font-size:.9375rem;text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:7px"><span>📚</span>TestBank</a>
+      <a href="dashboard.html" style="text-decoration:none;display:flex;align-items:center;gap:10px">
+        <img src="logo.png" alt="Prinberk Academy" style="height:42px;width:auto" />
+        <span style="font-weight:800;color:#1a3263;font-size:1.125rem;letter-spacing:-.02em;line-height:1">TestBank</span>
+      </a>
       <div class="hidden md:flex" style="align-items:center;gap:1px">
         ${links.map(l => lnk(l.href, l.label)).join('')}
         <a href="question-form.html" style="margin-left:10px;padding:6px 14px;font-size:.8125rem;font-weight:500;color:#fff;background:#4338ca;border-radius:4px;text-decoration:none">+ Add Question</a>
