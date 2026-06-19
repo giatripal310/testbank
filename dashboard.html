@@ -3,60 +3,89 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard — School Test Bank</title>
+  <title>Dashboard — TestBank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; }
+    .q-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px; transition: box-shadow .15s; }
+    .q-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 3px; font-size: .6875rem; font-weight: 500; }
+  </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen">
 
   <div id="nav"></div>
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-screen-xl mx-auto px-6 py-10">
+
+    <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-2xl font-bold text-gray-900" id="welcome">Welcome back! 👋</h1>
-      <p class="text-gray-500 mt-1 text-sm">Your school-wide question bank at a glance.</p>
+      <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Dashboard</h1>
+      <p class="text-sm text-slate-500 mt-1" id="greeting"></p>
     </div>
 
-    <!-- Quick actions -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-      <a href="question-form.html" class="flex items-center gap-3 bg-indigo-600 text-white p-4 rounded-xl hover:bg-indigo-700 transition-colors shadow-sm">
-        <div class="p-2 bg-white/20 rounded-lg text-xl">+</div>
-        <div><p class="font-semibold">Add Question</p><p class="text-xs text-indigo-200">Write a new question manually</p></div>
-      </a>
-      <a href="generate.html" class="flex items-center gap-3 bg-violet-600 text-white p-4 rounded-xl hover:bg-violet-700 transition-colors shadow-sm">
-        <div class="p-2 bg-white/20 rounded-lg text-xl">✨</div>
-        <div><p class="font-semibold">AI Generate</p><p class="text-xs text-violet-200">Let AI draft questions for you</p></div>
-      </a>
-      <a href="questions.html" class="flex items-center gap-3 bg-white border border-gray-200 text-gray-800 p-4 rounded-xl hover:bg-gray-50 transition-colors shadow-sm">
-        <div class="p-2 bg-gray-100 rounded-lg text-xl">🔍</div>
-        <div><p class="font-semibold">Browse Bank</p><p class="text-xs text-gray-400">Search & filter all questions</p></div>
-      </a>
+    <!-- Stats -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+      <div class="stat-card">
+        <div class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Total Questions</div>
+        <div class="text-3xl font-bold text-slate-900" id="statTotal">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Subjects</div>
+        <div class="text-3xl font-bold text-slate-900" id="statSubjects">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Saved Tests</div>
+        <div class="text-3xl font-bold text-slate-900" id="statTests">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Added This Month</div>
+        <div class="text-3xl font-bold text-slate-900" id="statMonth">—</div>
+      </div>
     </div>
 
-    <!-- Stats + Subject breakdown -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-      <div class="bg-white rounded-xl border border-gray-200 p-6 flex items-center gap-4">
-        <div class="p-3 bg-indigo-50 rounded-xl text-3xl">📊</div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- Recent questions -->
+      <div class="lg:col-span-2">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-semibold text-slate-700 uppercase tracking-wide">Recent Questions</h2>
+          <a href="questions.html" class="text-xs text-indigo-600 font-medium hover:text-indigo-800">View all →</a>
+        </div>
+        <div id="recentList" class="space-y-3">
+          <div class="q-card text-sm text-slate-400">Loading…</div>
+        </div>
+      </div>
+
+      <!-- Quick actions + subject breakdown -->
+      <div class="space-y-6">
         <div>
-          <p class="text-3xl font-bold text-gray-900" id="totalCount">—</p>
-          <p class="text-sm text-gray-500">Total questions</p>
+          <div class="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-4">Quick Actions</div>
+          <div class="space-y-2">
+            <a href="question-form.html" class="flex items-center gap-3 px-4 py-3 bg-indigo-700 text-white rounded-md text-sm font-medium hover:bg-indigo-800 transition-colors">
+              <span>＋</span> Add a Question
+            </a>
+            <a href="test-builder.html" class="flex items-center gap-3 px-4 py-3 bg-white border border-slate-200 text-slate-700 rounded-md text-sm font-medium hover:bg-slate-50 transition-colors">
+              <span>📋</span> Build a Test
+            </a>
+            <a href="generate.html" class="flex items-center gap-3 px-4 py-3 bg-white border border-slate-200 text-slate-700 rounded-md text-sm font-medium hover:bg-slate-50 transition-colors">
+              <span>✦</span> AI Generate
+            </a>
+            <a href="questions.html" class="flex items-center gap-3 px-4 py-3 bg-white border border-slate-200 text-slate-700 rounded-md text-sm font-medium hover:bg-slate-50 transition-colors">
+              <span>🔍</span> Search Questions
+            </a>
+          </div>
         </div>
-      </div>
-      <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-sm font-semibold text-gray-700 mb-4">Questions by Subject</h2>
-        <div id="subjectGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          <p class="text-sm text-gray-400 col-span-3">Loading…</p>
-        </div>
-      </div>
-    </div>
 
-    <!-- Recent questions -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-sm font-semibold text-gray-700">Recently Added</h2>
-        <a href="questions.html" class="text-xs text-indigo-600 hover:underline">View all →</a>
-      </div>
-      <div id="recentList">
-        <p class="text-sm text-gray-400 py-4 text-center">Loading…</p>
+        <div>
+          <div class="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-4">By Subject</div>
+          <div id="subjectBreakdown" class="space-y-2">
+            <div class="text-sm text-slate-400">Loading…</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -67,61 +96,86 @@
     async function init() {
       const user = await requireAuth()
       if (!user) return
-
-      // Nav
       document.getElementById('nav').innerHTML = navHTML('dashboard.html')
 
-      // Welcome
-      const { data: profile } = await db.from('profiles').select('full_name').eq('id', user.id).single()
-      const name = profile?.full_name?.split(' ')[0] || ''
-      if (name) document.getElementById('welcome').textContent = `Welcome back, ${name}! 👋`
+      const name = user.user_metadata?.full_name?.split(' ')[0] || 'there'
+      const hour = new Date().getHours()
+      const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+      document.getElementById('greeting').textContent = `${greeting}, ${name}.`
 
-      // Total count
-      const { count } = await db.from('questions').select('*', { count: 'exact', head: true }).eq('is_active', true)
-      document.getElementById('totalCount').textContent = count ?? 0
+      loadStats(user)
+      loadRecent()
+    }
+
+    async function loadStats(user) {
+      const now = new Date()
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+
+      const [{ count: total }, { count: monthCount }, { data: subjects }, { count: tests }] = await Promise.all([
+        db.from('questions').select('*', { count: 'exact', head: true }).eq('is_active', true),
+        db.from('questions').select('*', { count: 'exact', head: true }).eq('is_active', true).gte('created_at', monthStart),
+        db.from('questions').select('subject').eq('is_active', true),
+        db.from('tests').select('*', { count: 'exact', head: true }).eq('is_active', true),
+      ])
+
+      document.getElementById('statTotal').textContent = total ?? '0'
+      document.getElementById('statMonth').textContent = monthCount ?? '0'
+      document.getElementById('statTests').textContent = tests ?? '0'
+
+      const uniqueSubjects = new Set((subjects || []).map(r => r.subject))
+      document.getElementById('statSubjects').textContent = uniqueSubjects.size
 
       // Subject breakdown
-      const { data: rows } = await db.from('questions').select('subject').eq('is_active', true)
       const counts = {}
-      rows?.forEach(r => { counts[r.subject] = (counts[r.subject] || 0) + 1 })
-      const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6)
+      ;(subjects || []).forEach(r => { counts[r.subject] = (counts[r.subject] || 0) + 1 })
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6)
+      const max = sorted[0]?.[1] || 1
 
-      if (top.length === 0) {
-        document.getElementById('subjectGrid').innerHTML = '<p class="text-sm text-gray-400 col-span-3">No questions yet.</p>'
-      } else {
-        document.getElementById('subjectGrid').innerHTML = top.map(([subj, cnt]) => {
-          const s = getSubject(subj)
-          const c = SUBJECT_COLORS[s.color] || SUBJECT_COLORS.gray
-          return `<a href="questions.html?subject=${subj}" style="background:${c.bg};color:${c.text}"
-            class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium hover:opacity-80">
-            <span>${s.label}</span><span class="font-bold">${cnt}</span></a>`
-        }).join('')
-      }
+      document.getElementById('subjectBreakdown').innerHTML = sorted.length ? sorted.map(([sub, cnt]) => {
+        const s = getSubject(sub)
+        const c = SUBJECT_COLORS[s.color] || SUBJECT_COLORS.gray
+        const pct = Math.round((cnt / max) * 100)
+        return `
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-medium text-slate-600">${s.label}</span>
+              <span class="text-xs text-slate-400">${cnt}</span>
+            </div>
+            <div style="height:4px;background:#f1f5f9;border-radius:2px">
+              <div style="height:4px;width:${pct}%;background:${c.text};border-radius:2px;transition:width .5s"></div>
+            </div>
+          </div>`
+      }).join('') : '<div class="text-sm text-slate-400">No questions yet.</div>'
+    }
 
-      // Recent questions
-      const { data: recent } = await db.from('questions')
-        .select('id,question_code,title,subject,difficulty,created_at')
+    async function loadRecent() {
+      const { data } = await db.from('questions')
+        .select('id,question_code,title,subject,difficulty,question_type,created_at')
         .eq('is_active', true)
         .order('created_at', { ascending: false })
         .limit(8)
 
-      if (!recent?.length) {
+      if (!data?.length) {
         document.getElementById('recentList').innerHTML = `
-          <div class="text-center py-8">
-            <p class="text-gray-400 text-sm mb-2">No questions yet.</p>
-            <a href="question-form.html" class="text-sm text-indigo-600 hover:underline">Add the first one →</a>
+          <div class="q-card text-sm text-slate-400 text-center py-8">
+            No questions yet. <a href="question-form.html" class="text-indigo-600 font-medium">Add the first one →</a>
           </div>`
-      } else {
-        document.getElementById('recentList').innerHTML = recent.map(q => `
-          <a href="question-form.html?id=${q.id}"
-            class="flex items-center gap-3 py-2.5 px-2 hover:bg-gray-50 rounded-lg transition-colors border-b border-gray-50 last:border-0">
-            <span class="font-mono text-xs text-gray-400 w-36 shrink-0 truncate">${q.question_code}</span>
-            <span class="flex-1 text-sm text-gray-800 truncate">${q.title}</span>
-            <span class="shrink-0 hidden sm:block">${subjectBadge(q.subject)}</span>
-            <span class="shrink-0">${difficultyBadge(q.difficulty)}</span>
-            <span class="text-xs text-gray-400 shrink-0 hidden md:block">${formatDate(q.created_at)}</span>
-          </a>`).join('')
+        return
       }
+
+      document.getElementById('recentList').innerHTML = data.map(q => `
+        <a href="question-form.html?id=${q.id}" class="q-card flex items-start gap-4 no-underline block">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1 flex-wrap">
+              <span class="font-mono text-xs text-slate-400">${q.question_code}</span>
+              ${subjectBadge(q.subject)}
+              ${difficultyBadge(q.difficulty)}
+            </div>
+            <p class="text-sm font-medium text-slate-800 truncate">${q.title}</p>
+            <p class="text-xs text-slate-400 mt-0.5">${getTypeLabel(q.question_type)} · ${formatDate(q.created_at)}</p>
+          </div>
+          <span class="text-slate-300 text-lg mt-0.5">›</span>
+        </a>`).join('')
     }
 
     init()

@@ -3,94 +3,98 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Generate — School Test Bank</title>
+  <title>AI Generate — TestBank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .inp { width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: .5rem .75rem; font-size: .875rem; background: #fff; color: #0f172a; font-family: inherit; transition: border-color .15s, box-shadow .15s; }
+    .inp:focus { outline: none; border-color: #4338ca; box-shadow: 0 0 0 3px rgba(67,56,202,.1); }
+    .field-label { display: block; font-size: .8125rem; font-weight: 500; color: #475569; margin-bottom: 5px; }
+    .q-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 22px; }
+    .q-card.saved { border-color: #86efac; background: #f0fdf4; }
+  </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen">
 
   <div id="nav"></div>
 
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900">✨ AI Question Generator</h1>
-      <p class="text-gray-500 text-sm mt-1">Describe a topic and let AI draft questions aligned to your curriculum.</p>
+  <div class="max-w-3xl mx-auto px-6 py-10">
+    <div class="mb-7">
+      <h1 class="text-2xl font-bold text-slate-900 tracking-tight">✦ AI Question Generator</h1>
+      <p class="text-sm text-slate-500 mt-1">Describe a topic and let AI draft questions aligned to your curriculum.</p>
     </div>
 
-    <!-- Generation form -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+    <!-- Form -->
+    <div class="bg-white border border-slate-200 rounded-lg p-6 mb-6">
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+          <label class="field-label">Subject</label>
           <select id="gSubject" class="inp"></select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Grade Level</label>
+          <label class="field-label">Grade Level</label>
           <select id="gGrade" class="inp"></select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+          <label class="field-label">Difficulty</label>
           <select id="gDifficulty" class="inp"></select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Question Type</label>
+          <label class="field-label">Question Type</label>
           <select id="gType" class="inp"></select>
         </div>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
         <div class="sm:col-span-3">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Topic / Concept *</label>
+          <label class="field-label">Topic / Concept *</label>
           <input id="gTopic" type="text" class="inp" placeholder="e.g. Multiplication of fractions, Water cycle, American Revolution…"
             onkeydown="if(event.key==='Enter') generate()" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Number of questions</label>
+          <label class="field-label">Count</label>
           <select id="gCount" class="inp">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3" selected>3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            <option value="1">1 question</option>
+            <option value="2">2 questions</option>
+            <option value="3" selected>3 questions</option>
+            <option value="4">4 questions</option>
+            <option value="5">5 questions</option>
           </select>
         </div>
       </div>
 
-      <!-- Optional curriculum context -->
       <details class="mb-4">
-        <summary class="text-sm text-gray-500 cursor-pointer hover:text-gray-700 select-none">Paste curriculum context (optional)</summary>
+        <summary class="text-xs text-slate-400 cursor-pointer hover:text-slate-600 select-none font-medium">+ Paste curriculum context (optional)</summary>
         <textarea id="gContext" rows="4" class="inp mt-2 resize-y" placeholder="Paste relevant learning objectives, standards, or curriculum text here to guide the AI…"></textarea>
       </details>
 
-      <div id="workerWarning" class="hidden mb-4 p-3 bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm rounded-lg">
-        ⚠️ AI Worker URL not set. Please complete the Cloudflare Worker setup in <code>config.js</code> first.
+      <div id="workerWarning" class="hidden mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded">
+        ⚠️ AI Worker URL is not set. Complete the Cloudflare Worker setup in <code>config.js</code> first.
       </div>
 
       <button id="generateBtn" onclick="generate()"
-        class="flex items-center gap-2 bg-violet-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-60 transition-colors">
-        ✨ Generate Questions
+        class="flex items-center gap-2 bg-indigo-700 text-white px-5 py-2.5 rounded text-sm font-semibold hover:bg-indigo-800 transition-colors disabled:opacity-60">
+        ✦ Generate Questions
       </button>
     </div>
 
     <!-- Results -->
     <div id="resultsSection" class="hidden">
       <div class="flex items-center justify-between mb-4">
-        <h2 id="resultsTitle" class="text-lg font-semibold text-gray-800"></h2>
+        <h2 id="resultsTitle" class="text-base font-semibold text-slate-800"></h2>
         <div class="flex gap-2">
-          <button onclick="generate()" class="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">🔄 Regenerate</button>
-          <button onclick="saveAll()" class="flex items-center gap-1.5 px-4 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700">💾 Save All</button>
+          <button onclick="generate()" class="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-slate-200 rounded bg-white hover:bg-slate-50 text-slate-600">↺ Regenerate</button>
+          <button onclick="saveAll()" class="flex items-center gap-1.5 px-4 py-1.5 text-sm bg-emerald-600 text-white rounded hover:bg-emerald-700 font-medium">Save All</button>
         </div>
       </div>
       <div id="resultsList" class="space-y-4"></div>
       <div class="mt-6">
-        <a href="questions.html" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors">View Question Bank</a>
+        <a href="questions.html" class="text-sm text-slate-400 hover:text-slate-600 transition-colors">← View Question Bank</a>
       </div>
     </div>
   </div>
-
-  <style>
-    .inp { width: 100%; border: 1px solid #d1d5db; border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; outline: none; background: white; }
-    .inp:focus { border-color: #6366f1; box-shadow: 0 0 0 2px #e0e7ff; }
-  </style>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="config.js"></script>
@@ -104,7 +108,6 @@
       if (!currentUser) return
       document.getElementById('nav').innerHTML = navHTML('generate.html')
 
-      // Populate dropdowns
       const subj = document.getElementById('gSubject')
       SUBJECTS.forEach(s => { const o = document.createElement('option'); o.value = s.value; o.textContent = s.label; subj.appendChild(o) })
 
@@ -117,13 +120,11 @@
       const type = document.getElementById('gType')
       QUESTION_TYPES.forEach(t => { const o = document.createElement('option'); o.value = t.value; o.textContent = t.label; type.appendChild(o) })
 
-      // Defaults
       document.getElementById('gSubject').value    = 'math'
       document.getElementById('gGrade').value      = '3'
       document.getElementById('gDifficulty').value = '2'
       document.getElementById('gType').value       = 'multiple_choice'
 
-      // Check if worker URL is set
       if (!AI_WORKER_URL || AI_WORKER_URL === 'YOUR-CLOUDFLARE-WORKER-URL') {
         document.getElementById('workerWarning').classList.remove('hidden')
       }
@@ -132,15 +133,12 @@
     async function generate() {
       const topic = document.getElementById('gTopic').value.trim()
       if (!topic) { alert('Please enter a topic'); return }
-
       if (!AI_WORKER_URL || AI_WORKER_URL === 'YOUR-CLOUDFLARE-WORKER-URL') {
-        alert('Please set up the Cloudflare Worker and update AI_WORKER_URL in config.js')
-        return
+        alert('Please set up the Cloudflare Worker and update AI_WORKER_URL in config.js'); return
       }
 
       const btn = document.getElementById('generateBtn')
-      btn.disabled = true
-      btn.textContent = '⏳ Generating…'
+      btn.disabled = true; btn.textContent = '⏳ Generating…'
       document.getElementById('resultsSection').classList.add('hidden')
       savedSet = new Set()
 
@@ -182,7 +180,6 @@ For non-MCQ, omit "options" and put the answer in "correct_answer".`
             messages: [{ role: 'user', content: `Topic: ${topic}. Generate ${count} question(s).` }]
           })
         })
-
         if (!res.ok) throw new Error(`Worker error: ${res.status}`)
         const data = await res.json()
         const raw = data.content?.[0]?.text || '[]'
@@ -190,49 +187,48 @@ For non-MCQ, omit "options" and put the answer in "correct_answer".`
         generatedQuestions = JSON.parse(cleaned)
       } catch (err) {
         alert('Generation failed: ' + err.message)
-        btn.disabled = false; btn.textContent = '✨ Generate Questions'; return
+        btn.disabled = false; btn.textContent = '✦ Generate Questions'; return
       }
 
-      btn.disabled = false
-      btn.textContent = '✨ Generate Questions'
+      btn.disabled = false; btn.textContent = '✦ Generate Questions'
       renderResults()
     }
 
     function renderResults() {
       document.getElementById('resultsSection').classList.remove('hidden')
-      document.getElementById('resultsTitle').textContent = `Generated ${generatedQuestions.length} question${generatedQuestions.length !== 1 ? 's' : ''}`
+      document.getElementById('resultsTitle').textContent = `${generatedQuestions.length} question${generatedQuestions.length !== 1 ? 's' : ''} generated`
 
       document.getElementById('resultsList').innerHTML = generatedQuestions.map((q, i) => `
-        <div id="qcard${i}" class="bg-white rounded-xl border p-5 transition-colors ${savedSet.has(i) ? 'border-green-300 bg-green-50' : 'border-gray-200'}">
+        <div id="qcard${i}" class="q-card ${savedSet.has(i) ? 'saved' : ''}">
           <div class="flex items-start justify-between gap-4">
             <div class="flex-1">
-              <p class="text-xs font-medium text-gray-400 mb-1">Question ${i + 1}</p>
-              <p class="font-semibold text-gray-900 mb-1">${q.title}</p>
-              <p class="text-sm text-gray-700 leading-relaxed">${q.content}</p>
+              <p class="text-xs font-medium text-slate-400 mb-1">Question ${i + 1}</p>
+              <p class="font-semibold text-slate-900 mb-1.5">${q.title}</p>
+              <p class="text-sm text-slate-600 leading-relaxed">${q.content}</p>
 
               ${q.options?.length ? `
                 <div class="mt-3 space-y-1">
                   ${q.options.map(o => `
-                    <div class="text-sm px-3 py-1.5 rounded-lg flex items-center gap-2 ${o.is_correct ? 'bg-green-100 text-green-800 font-medium' : 'text-gray-600'}">
-                      <span class="font-bold w-4">${o.id}.</span>${o.text}
-                      ${o.is_correct ? '<span class="ml-auto text-green-600 text-xs">✓ correct</span>' : ''}
+                    <div class="text-sm px-3 py-1.5 rounded flex items-center gap-2 ${o.is_correct ? 'bg-emerald-50 text-emerald-800 font-medium' : 'text-slate-600'}">
+                      <span class="font-bold w-4 shrink-0">${o.id}.</span>${o.text}
+                      ${o.is_correct ? '<span class="ml-auto text-emerald-600 text-xs font-medium">✓</span>' : ''}
                     </div>`).join('')}
                 </div>` : ''}
 
               ${!q.options && q.correct_answer ? `
-                <p class="mt-2 text-sm text-green-700 bg-green-50 px-3 py-1.5 rounded-lg">
+                <p class="mt-2 text-sm text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded">
                   <span class="font-medium">Answer:</span> ${q.correct_answer}
                 </p>` : ''}
 
               ${q.explanation ? `
-                <p class="mt-2 text-xs text-gray-500 bg-gray-50 px-3 py-2 rounded-lg">
+                <p class="mt-2 text-xs text-slate-400 bg-slate-50 px-3 py-2 rounded border border-slate-100">
                   <span class="font-medium">Explanation:</span> ${q.explanation}
                 </p>` : ''}
             </div>
 
             <button onclick="saveOne(${i})" id="saveBtn${i}"
-              class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${savedSet.has(i) ? 'bg-green-100 text-green-700 cursor-default' : 'bg-indigo-600 text-white hover:bg-indigo-700'}">
-              ${savedSet.has(i) ? '✓ Saved' : '💾 Save'}
+              class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors ${savedSet.has(i) ? 'bg-emerald-100 text-emerald-700 cursor-default' : 'bg-indigo-700 text-white hover:bg-indigo-800'}">
+              ${savedSet.has(i) ? '✓ Saved' : 'Save'}
             </button>
           </div>
         </div>`).join('')
@@ -240,10 +236,9 @@ For non-MCQ, omit "options" and put the answer in "correct_answer".`
 
     async function saveOne(i) {
       if (savedSet.has(i)) return
-      const q       = generatedQuestions[i]
-      const btn     = document.getElementById('saveBtn' + i)
-      btn.textContent = '⏳'
-      btn.disabled  = true
+      const q = generatedQuestions[i]
+      const btn = document.getElementById('saveBtn' + i)
+      btn.textContent = '…'; btn.disabled = true
 
       const subject = document.getElementById('gSubject').value
       const grade   = document.getElementById('gGrade').value
@@ -251,22 +246,22 @@ For non-MCQ, omit "options" and put the answer in "correct_answer".`
       const code    = prefix + Date.now().toString().slice(-4)
 
       const { error } = await db.from('questions').insert({
-        question_code:   code,
-        title:           q.title,
-        content:         q.content,
-        question_type:   document.getElementById('gType').value,
+        question_code:  code,
+        title:          q.title,
+        content:        q.content,
+        question_type:  document.getElementById('gType').value,
         subject,
-        grade_level:     grade,
-        difficulty:      parseInt(document.getElementById('gDifficulty').value),
-        options:         q.options || null,
-        correct_answer:  q.correct_answer || (q.options?.find(o => o.is_correct)?.id || ''),
-        explanation:     q.explanation || '',
-        tags:            ['ai-generated', subject, 'grade-' + grade],
-        created_by:      currentUser.id,
-        updated_by:      currentUser.id,
+        grade_level:    grade,
+        difficulty:     parseInt(document.getElementById('gDifficulty').value),
+        options:        q.options || null,
+        correct_answer: q.correct_answer || (q.options?.find(o => o.is_correct)?.id || ''),
+        explanation:    q.explanation || '',
+        tags:           ['ai-generated', subject, 'grade-' + grade],
+        created_by:     currentUser.id,
+        updated_by:     currentUser.id,
       })
 
-      if (error) { alert('Save failed: ' + error.message); btn.disabled = false; btn.textContent = '💾 Save'; return }
+      if (error) { alert('Save failed: ' + error.message); btn.disabled = false; btn.textContent = 'Save'; return }
       savedSet.add(i)
       renderResults()
     }

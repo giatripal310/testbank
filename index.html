@@ -3,86 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>School Test Bank — Login</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>TestBank — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f8fafc; color: #0f172a; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 48px 48px 40px; width: 100%; max-width: 400px; text-align: center; }
+    .logo { font-size: 2rem; margin-bottom: 20px; }
+    .brand { font-size: 1.5rem; font-weight: 700; color: #0f172a; letter-spacing: -.03em; margin-bottom: 8px; }
+    .tagline { font-size: .875rem; color: #64748b; line-height: 1.6; margin-bottom: 36px; }
+    .divider { border: none; border-top: 1px solid #e2e8f0; margin: 0 0 28px; }
+    .btn-google { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 11px 16px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; font-size: .875rem; font-weight: 500; color: #1e293b; cursor: pointer; font-family: inherit; transition: background .15s, border-color .15s; }
+    .btn-google:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .note { font-size: .75rem; color: #94a3b8; margin-top: 20px; line-height: 1.6; }
+    #status { font-size: .8125rem; color: #64748b; margin-top: 14px; min-height: 18px; }
+  </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-indigo-700 via-indigo-600 to-blue-500 flex flex-col items-center justify-center px-4 py-12">
-
-  <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 text-center">
-    <div class="text-5xl mb-3">📚</div>
-    <h1 class="text-2xl font-bold text-gray-900 mb-1">School Test Bank</h1>
-    <p class="text-sm text-gray-500 mb-8">A shared question bank for every teacher, K–12.</p>
-
-    <div id="errorMsg" class="hidden mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg"></div>
-
-    <button id="googleBtn" onclick="signInWithGoogle()"
-      class="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-      <svg viewBox="0 0 24 24" width="18" height="18">
-        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+<body>
+  <div class="card">
+    <div class="logo">📚</div>
+    <div class="brand">TestBank</div>
+    <p class="tagline">A shared question bank for K–12 teachers.<br>Build, search, and generate assessments together.</p>
+    <hr class="divider">
+    <button class="btn-google" onclick="signIn()">
+      <svg width="18" height="18" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
       </svg>
-      <span id="btnText">Sign in with Google</span>
+      Continue with Google
     </button>
-
-    <p class="text-xs text-gray-400 mt-4">Use your school Google account. All teachers share access.</p>
-  </div>
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-10 w-full max-w-2xl">
-    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white">
-      <p class="font-semibold text-sm mb-1">📖 Shared Question Bank</p>
-      <p class="text-xs text-white/70">All teachers share one central bank organised by subject, grade, and difficulty.</p>
-    </div>
-    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white">
-      <p class="font-semibold text-sm mb-1">✨ AI Generation</p>
-      <p class="text-xs text-white/70">Let AI draft questions by topic, grade, and difficulty — review and save in one click.</p>
-    </div>
-    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white">
-      <p class="font-semibold text-sm mb-1">🔍 Instant Search</p>
-      <p class="text-xs text-white/70">Find any question by name, code, or keyword instantly.</p>
-    </div>
-    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white">
-      <p class="font-semibold text-sm mb-1">👩‍🏫 Collaborate</p>
-      <p class="text-xs text-white/70">Every teacher can add and edit questions. No more duplicated work.</p>
-    </div>
+    <div id="status"></div>
+    <p class="note">Sign in with your school Google account.<br>Access is open to all verified teachers.</p>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="config.js"></script>
   <script>
-    // If already logged in, go straight to dashboard
-    db.auth.getSession().then(({ data: { session } }) => {
+    async function init() {
+      const { data: { session } } = await db.auth.getSession()
       if (session) window.location.href = 'dashboard.html'
-    })
+    }
 
-    // Also listen for auth state changes (handles OAuth redirect)
-    db.auth.onAuthStateChange((event, session) => {
-      if (session) window.location.href = 'dashboard.html'
-    })
-
-    async function signInWithGoogle() {
-      const btn = document.getElementById('googleBtn')
-      const txt = document.getElementById('btnText')
-      btn.disabled = true
-      txt.textContent = 'Redirecting…'
-
-      // Build redirect URL dynamically so it works both locally and on GitHub Pages
-      const base = window.location.href.replace('index.html', '').replace(/\/$/, '')
-      const redirectTo = base + '/dashboard.html'
-
+    async function signIn() {
+      document.getElementById('status').textContent = 'Redirecting to Google…'
+      const base = window.location.href.replace(/\/[^/]*$/, '')
       const { error } = await db.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo }
+        options: { redirectTo: base + '/dashboard.html' }
       })
-
-      if (error) {
-        document.getElementById('errorMsg').textContent = error.message
-        document.getElementById('errorMsg').classList.remove('hidden')
-        btn.disabled = false
-        txt.textContent = 'Sign in with Google'
-      }
+      if (error) document.getElementById('status').textContent = 'Error: ' + error.message
     }
+
+    init()
   </script>
 </body>
 </html>

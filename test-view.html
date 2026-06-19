@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test — TestBank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f8fafc; color: #0f172a; }
+
+    /* Screen toolbar */
+    .toolbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      background: #fff; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; height: 52px;
+      font-size: .875rem;
+    }
+    .toolbar .left { display: flex; align-items: center; gap: 12px; }
+    .toolbar .right { display: flex; align-items: center; gap: 8px; }
+    .tb-btn {
+      padding: 6px 14px; border-radius: 5px; font-size: .8125rem; font-weight: 500;
+      cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #374151;
+      font-family: inherit; transition: background .15s;
+    }
+    .tb-btn:hover { background: #f1f5f9; }
+    .tb-btn.primary { background: #4338ca; color: #fff; border-color: #4338ca; }
+    .tb-btn.primary:hover { background: #3730a3; }
+    .toggle-key { padding: 5px 12px; border-radius: 5px; font-size: .8125rem; font-weight: 500; cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #374151; font-family: inherit; }
+    .toggle-key.on { background: #fef9c3; border-color: #fde047; color: #854d0e; }
+
+    /* Print page wrapper */
+    .page-wrap {
+      max-width: 760px; margin: 72px auto 48px; background: #fff;
+      border: 1px solid #e2e8f0; border-radius: 8px;
+      padding: 56px 64px;
+      min-height: 1000px;
+    }
+
+    /* Test header */
+    .test-header { border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 28px; }
+    .test-meta { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .test-school { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: #64748b; }
+    .test-code { font-size: .75rem; font-family: monospace; color: #64748b; }
+    .test-title { font-size: 1.375rem; font-weight: 700; color: #0f172a; letter-spacing: -.02em; margin-bottom: 4px; }
+    .test-subtitle { font-size: .875rem; color: #64748b; }
+
+    .student-fields { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-top: 20px; }
+    .field-line { border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; }
+    .field-line-label { font-size: .6875rem; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; margin-top: 4px; }
+
+    /* Instructions */
+    .instructions { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 5px; padding: 12px 16px; margin-bottom: 28px; font-size: .875rem; color: #475569; line-height: 1.6; }
+
+    /* Questions */
+    .question-block { margin-bottom: 32px; page-break-inside: avoid; }
+    .q-number { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #64748b; margin-bottom: 6px; }
+    .q-text { font-size: .9375rem; color: #0f172a; line-height: 1.65; margin-bottom: 12px; }
+    .q-meta { font-size: .6875rem; color: #94a3b8; margin-bottom: 10px; }
+
+    /* MCQ options */
+    .mcq-options { display: flex; flex-direction: column; gap: 6px; margin-left: 2px; }
+    .mcq-option { display: flex; align-items: flex-start; gap: 10px; font-size: .875rem; color: #1e293b; padding: 6px 10px; border-radius: 4px; }
+    .mcq-option.correct-shown { background: #f0fdf4; color: #166534; }
+    .mcq-letter { font-weight: 700; width: 16px; shrink: 0; }
+
+    /* Answer spaces */
+    .answer-space { border-bottom: 1px solid #cbd5e1; margin: 8px 0; height: 32px; }
+    .answer-lines { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+    .answer-line { border-bottom: 1px solid #e2e8f0; height: 24px; }
+    .essay-space { border: 1px solid #e2e8f0; border-radius: 4px; height: 120px; margin-top: 8px; }
+    .tf-bubbles { display: flex; gap: 20px; margin-top: 8px; }
+    .tf-bubble { display: flex; align-items: center; gap: 8px; font-size: .875rem; }
+    .bubble { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #94a3b8; display: inline-block; }
+
+    /* Answer key */
+    .answer-key { margin-top: 48px; padding-top: 24px; border-top: 2px dashed #cbd5e1; }
+    .answer-key-title { font-size: .8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #64748b; margin-bottom: 16px; }
+    .key-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .key-item { font-size: .8125rem; color: #0f172a; padding: 5px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; }
+    .key-item span { font-weight: 600; }
+
+    /* Print styles */
+    @media print {
+      .toolbar { display: none !important; }
+      .page-wrap { margin: 0; border: none; border-radius: 0; padding: 36px 48px; box-shadow: none; }
+      body { background: #fff; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen toolbar (hidden when printing) -->
+  <div class="toolbar no-print">
+    <div class="left">
+      <a href="tests.html" style="color:#64748b;text-decoration:none;font-size:.8125rem">← Back to Tests</a>
+      <span id="toolbarTitle" style="font-weight:600;color:#0f172a"></span>
+    </div>
+    <div class="right">
+      <button class="toggle-key" id="keyToggle" onclick="toggleAnswerKey()">Show Answer Key</button>
+      <button class="tb-btn primary" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
+
+  <!-- Printable page -->
+  <div class="page-wrap" id="printPage">
+    <div id="testContent">
+      <p style="color:#94a3b8;font-size:.875rem;text-align:center;padding:40px 0">Loading…</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script>
+    let showKey = false
+    let testData = null
+
+    async function init() {
+      // Auth check (skip for print view if opened directly)
+      const { data: { session } } = await db.auth.getSession()
+      if (!session) { window.location.href = 'index.html'; return }
+
+      const params = new URLSearchParams(window.location.search)
+
+      if (params.get('preview') === '1') {
+        const raw = sessionStorage.getItem('testPreview')
+        if (!raw) { document.getElementById('testContent').innerHTML = '<p style="color:red">Preview data not found.</p>'; return }
+        testData = JSON.parse(raw)
+        render(testData, testData.questions)
+      } else {
+        const id = params.get('id')
+        if (!id) { window.location.href = 'tests.html'; return }
+
+        const { data: t, error } = await db.from('tests').select('*').eq('id', id).single()
+        if (error || !t) { document.getElementById('testContent').innerHTML = '<p style="color:red">Test not found.</p>'; return }
+        testData = t
+
+        let questions = []
+        if (t.question_ids?.length) {
+          const { data: qs } = await db.from('questions').select('*').in('id', t.question_ids).eq('is_active', true)
+          if (qs) questions = t.question_ids.map(id => qs.find(q => q.id === id)).filter(Boolean)
+        }
+        render(t, questions)
+      }
+    }
+
+    function render(t, questions) {
+      document.title = t.title + ' — TestBank'
+      document.getElementById('toolbarTitle').textContent = t.title
+
+      const subjectLabel = t.subject ? getSubject(t.subject).label : ''
+      const gradeLabel   = t.grade_level ? getGradeLabel(t.grade_level) : ''
+      const subtitle     = [subjectLabel, gradeLabel].filter(Boolean).join(' · ')
+
+      document.getElementById('testContent').innerHTML = `
+        <div class="test-header">
+          <div class="test-meta">
+            <div class="test-school">School Test Bank</div>
+            <div class="test-code">${t.test_code}</div>
+          </div>
+          <div class="test-title">${t.title}</div>
+          ${subtitle ? `<div class="test-subtitle">${subtitle}</div>` : ''}
+          <div class="student-fields">
+            <div><div class="field-line"></div><div class="field-line-label">Student Name</div></div>
+            <div><div class="field-line"></div><div class="field-line-label">Class / Period</div></div>
+            <div><div class="field-line"></div><div class="field-line-label">Date</div></div>
+          </div>
+        </div>
+
+        ${t.instructions ? `<div class="instructions"><strong>Instructions:</strong> ${t.instructions}</div>` : ''}
+
+        <div id="questionsList">
+          ${questions.map((q, i) => renderQuestion(q, i + 1)).join('')}
+        </div>
+
+        <div class="answer-key" id="answerKey" style="display:${showKey?'block':'none'}">
+          <div class="answer-key-title">Answer Key — Teacher Copy</div>
+          <div class="key-grid">
+            ${questions.map((q, i) => {
+              const ans = q.question_type === 'multiple_choice'
+                ? (q.options?.find(o => o.is_correct)?.id || q.correct_answer || '—')
+                : (q.correct_answer || '—')
+              return `<div class="key-item"><span>${i+1}.</span> ${ans}</div>`
+            }).join('')}
+          </div>
+          <div style="margin-top:20px">
+            ${questions.map((q, i) => q.explanation ? `
+              <div style="margin-bottom:10px;font-size:.8125rem">
+                <span style="font-weight:600;color:#475569">${i+1}.</span>
+                <span style="color:#475569">${q.explanation}</span>
+              </div>` : '').join('')}
+          </div>
+        </div>`
+    }
+
+    function renderQuestion(q, num) {
+      const typeLabel = getTypeLabel(q.question_type)
+      let answerHtml = ''
+
+      if (q.question_type === 'multiple_choice') {
+        const opts = q.options || []
+        answerHtml = `<div class="mcq-options">
+          ${opts.map(o => `
+            <div class="mcq-option" id="opt_${num}_${o.id}">
+              <div class="bubble"></div>
+              <span class="mcq-letter">${o.id}.</span>
+              <span>${o.text}</span>
+            </div>`).join('')}
+        </div>`
+      } else if (q.question_type === 'true_false') {
+        answerHtml = `<div class="tf-bubbles">
+          <div class="tf-bubble"><div class="bubble"></div> True</div>
+          <div class="tf-bubble"><div class="bubble"></div> False</div>
+        </div>`
+      } else if (q.question_type === 'short_answer' || q.question_type === 'fill_blank') {
+        answerHtml = `<div class="answer-lines">
+          <div class="answer-line"></div>
+          <div class="answer-line"></div>
+          <div class="answer-line"></div>
+        </div>`
+      } else if (q.question_type === 'essay') {
+        answerHtml = `<div class="essay-space"></div>`
+      }
+
+      return `
+        <div class="question-block">
+          <div class="q-number">Question ${num}</div>
+          <div class="q-text">${q.content}</div>
+          <div class="q-meta">${typeLabel} · ${getGradeLabel(q.grade_level)} · ${getDifficulty(q.difficulty).label}</div>
+          ${answerHtml}
+        </div>`
+    }
+
+    function toggleAnswerKey() {
+      showKey = !showKey
+      const el  = document.getElementById('answerKey')
+      const btn = document.getElementById('keyToggle')
+      if (el) el.style.display = showKey ? 'block' : 'none'
+      btn.textContent = showKey ? 'Hide Answer Key' : 'Show Answer Key'
+      btn.classList.toggle('on', showKey)
+    }
+
+    init()
+  </script>
+</body>
+</html>

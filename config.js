@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────
 const SUPABASE_URL      = 'https://rlrmumjiuiumpdqdlura.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJscm11bWppdWl1bXBkcWRsdXJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MDQ0MzMsImV4cCI6MjA5NzM4MDQzM30.EUGNQ1DFWy6PEkc0SPArsidPZrORdp6ENBlIABC1Jg4'
-const AI_WORKER_URL     = 'https://testbank.giatripal310.workers.dev/'   // set up after Cloudflare step
+const AI_WORKER_URL     = 'YOUR-CLOUDFLARE-WORKER-URL'   // set up after Cloudflare step
 // ─────────────────────────────────────────────
 
 const { createClient } = supabase
@@ -99,24 +99,28 @@ function navHTML(active) {
   const links = [
     { href: 'dashboard.html',     label: 'Dashboard'     },
     { href: 'questions.html',     label: 'Question Bank' },
-    { href: 'generate.html',      label: '✨ AI Generate' },
-    { href: 'question-form.html', label: '+ Add Question'},
+    { href: 'tests.html',         label: 'Tests'         },
+    { href: 'generate.html',      label: '✦ AI Generate' },
   ]
+  const lnk = (href, label) => {
+    const on = active === href
+    return `<a href="${href}" style="padding:6px 12px;font-size:.8125rem;font-weight:${on?'600':'400'};color:${on?'#3730a3':'#64748b'};background:${on?'#eef2ff':'transparent'};border-radius:4px;text-decoration:none">${label}</a>`
+  }
   return `
-  <nav class="bg-white border-b border-gray-200 sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-      <a href="dashboard.html" class="font-bold text-indigo-700 text-lg">📚 TestBank</a>
-      <div class="hidden md:flex items-center gap-1">
-        ${links.map(l => `
-          <a href="${l.href}" class="px-3 py-1.5 text-sm rounded-lg transition-colors ${active === l.href ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600 hover:bg-gray-100'}">${l.label}</a>
-        `).join('')}
-        <button onclick="signOut()" class="ml-2 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">Sign out</button>
+  <nav style="background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:40;font-family:'Inter',system-ui,sans-serif">
+    <div style="max-width:1280px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between">
+      <a href="dashboard.html" style="font-weight:700;color:#3730a3;font-size:.9375rem;text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:7px"><span>📚</span>TestBank</a>
+      <div class="hidden md:flex" style="align-items:center;gap:1px">
+        ${links.map(l => lnk(l.href, l.label)).join('')}
+        <a href="question-form.html" style="margin-left:10px;padding:6px 14px;font-size:.8125rem;font-weight:500;color:#fff;background:#4338ca;border-radius:4px;text-decoration:none">+ Add Question</a>
+        <button onclick="signOut()" style="margin-left:6px;padding:6px 12px;font-size:.8125rem;color:#94a3b8;background:none;border:none;cursor:pointer;border-radius:4px;font-family:inherit">Sign out</button>
       </div>
-      <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg hover:bg-gray-100" id="menuBtn">☰</button>
+      <button onclick="toggleMobileMenu()" class="md:hidden" style="padding:8px;border:none;background:none;cursor:pointer;font-size:1.1rem" id="menuBtn">☰</button>
     </div>
-    <div id="mobileMenu" class="hidden md:hidden border-t border-gray-200 bg-white px-4 py-2 space-y-1">
-      ${links.map(l => `<a href="${l.href}" class="block px-3 py-2 text-sm rounded-lg ${active === l.href ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100'}">${l.label}</a>`).join('')}
-      <button onclick="signOut()" class="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg">Sign out</button>
+    <div id="mobileMenu" class="hidden" style="border-top:1px solid #e2e8f0;background:#fff;padding:8px 16px 12px">
+      ${links.map(l => `<a href="${l.href}" style="display:block;padding:8px 12px;font-size:.875rem;border-radius:4px;text-decoration:none;color:${active===l.href?'#3730a3':'#374151'};font-weight:${active===l.href?'600':'400'}">${l.label}</a>`).join('')}
+      <a href="question-form.html" style="display:block;padding:8px 12px;font-size:.875rem;color:#374151;text-decoration:none">+ Add Question</a>
+      <button onclick="signOut()" style="display:block;width:100%;text-align:left;padding:8px 12px;font-size:.875rem;color:#94a3b8;background:none;border:none;cursor:pointer;font-family:inherit">Sign out</button>
     </div>
   </nav>`
 }
