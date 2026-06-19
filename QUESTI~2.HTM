@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Question Form — School Test Bank</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <div id="nav"></div>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+    <div class="flex items-center gap-3 mb-6">
+      <a href="questions.html" class="text-sm text-gray-500 hover:text-gray-700">← Back</a>
+      <h1 id="pageTitle" class="text-2xl font-bold text-gray-900">Add New Question</h1>
+    </div>
+
+    <div class="bg-white rounded-xl border border-gray-200 p-6">
+      <div id="errorMsg" class="hidden mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg"></div>
+
+      <!-- Code + Title -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Question Code *</label>
+          <input id="fCode" type="text" class="inp font-mono" placeholder="MATH-G3-ALG-001" required />
+          <p class="text-xs text-gray-400 mt-1">Unique ID for search</p>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Question Title *</label>
+          <input id="fTitle" type="text" class="inp" placeholder="Short descriptive name" required />
+        </div>
+      </div>
+
+      <!-- Subject / Grade / Difficulty / Type -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Subject *</label>
+          <select id="fSubject" class="inp" onchange="updateCode()">
+            <option value="">Select…</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Grade *</label>
+          <select id="fGrade" class="inp" onchange="updateCode()">
+            <option value="">Select…</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Difficulty *</label>
+          <select id="fDifficulty" class="inp">
+            <option value="">Select…</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+          <select id="fType" class="inp" onchange="renderAnswerSection()">
+            <option value="">Select…</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Question content -->
+      <div class="mb-5">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Question Content *</label>
+        <textarea id="fContent" rows="4" class="inp resize-y" placeholder="Type the full question here. Use ___ for blanks."></textarea>
+      </div>
+
+      <!-- Dynamic answer section -->
+      <div id="answerSection" class="mb-5"></div>
+
+      <!-- Explanation -->
+      <div class="mb-5">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Explanation / Answer Key Notes</label>
+        <textarea id="fExplanation" rows="3" class="inp resize-y" placeholder="Explain the correct answer — for teachers only."></textarea>
+      </div>
+
+      <!-- Curriculum ref + Tags -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Curriculum Reference</label>
+          <input id="fCurriculum" type="text" class="inp" placeholder="e.g. CCSS.MATH.3.OA.A.1" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tags (comma-separated)</label>
+          <input id="fTags" type="text" class="inp" placeholder="fractions, word problem, visual" />
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex items-center gap-3">
+        <button id="saveBtn" onclick="saveQuestion()" class="flex items-center gap-2 bg-indigo-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-60">
+          💾 Save Question
+        </button>
+        <a href="questions.html" class="px-4 py-2.5 text-sm text-gray-600 hover:text-gray-900">Cancel</a>
+        <div id="deleteArea" class="ml-auto hidden">
+          <button onclick="deleteQuestion()" class="text-sm text-red-500 hover:text-red-700">Delete question</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .inp { width: 100%; border: 1px solid #d1d5db; border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; outline: none; background: white; }
+    .inp:focus { ring: 2px solid #6366f1; border-color: #6366f1; box-shadow: 0 0 0 2px #e0e7ff; }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script>
+    let editId = null
+    let currentUser = null
+
+    async function init() {
+      currentUser = await requireAuth()
+      if (!currentUser) return
+      document.getElementById('nav').innerHTML = navHTML('question-form.html')
+
+      // Populate dropdowns
+      const subj = document.getElementById('fSubject')
+      SUBJECTS.forEach(s => { const o = document.createElement('option'); o.value = s.value; o.textContent = s.label; subj.appendChild(o) })
+
+      const grade = document.getElementById('fGrade')
+      GRADE_LEVELS.forEach(g => { const o = document.createElement('option'); o.value = g.value; o.textContent = g.label; grade.appendChild(o) })
+
+      const diff = document.getElementById('fDifficulty')
+      DIFFICULTY_LEVELS.forEach(d => { const o = document.createElement('option'); o.value = d.value; o.textContent = `${d.value} — ${d.label}`; diff.appendChild(o) })
+
+      const type = document.getElementById('fType')
+      QUESTION_TYPES.forEach(t => { const o = document.createElement('option'); o.value = t.value; o.textContent = t.label; type.appendChild(o) })
+
+      // Check if edit mode
+      const params = new URLSearchParams(window.location.search)
+      editId = params.get('id')
+      if (editId) {
+        document.getElementById('pageTitle').textContent = 'Edit Question'
+        document.getElementById('deleteArea').classList.remove('hidden')
+        await loadQuestion(editId)
+      } else {
+        // Default to MCQ
+        document.getElementById('fType').value = 'multiple_choice'
+        document.getElementById('fDifficulty').value = '2'
+        renderAnswerSection()
+      }
+    }
+
+    async function loadQuestion(id) {
+      const { data: q, error } = await db.from('questions').select('*').eq('id', id).single()
+      if (error || !q) { alert('Question not found'); window.location.href = 'questions.html'; return }
+
+      document.getElementById('fCode').value        = q.question_code
+      document.getElementById('fTitle').value       = q.title
+      document.getElementById('fContent').value     = q.content
+      document.getElementById('fSubject').value     = q.subject
+      document.getElementById('fGrade').value       = q.grade_level
+      document.getElementById('fDifficulty').value  = q.difficulty
+      document.getElementById('fType').value        = q.question_type
+      document.getElementById('fExplanation').value = q.explanation || ''
+      document.getElementById('fCurriculum').value  = q.curriculum_reference || ''
+      document.getElementById('fTags').value        = (q.tags || []).join(', ')
+
+      renderAnswerSection(q)
+    }
+
+    function renderAnswerSection(q = null) {
+      const type = document.getElementById('fType').value
+      const sec  = document.getElementById('answerSection')
+
+      if (type === 'multiple_choice') {
+        const opts = q?.options || [
+          { id: 'A', text: '', is_correct: false },
+          { id: 'B', text: '', is_correct: false },
+          { id: 'C', text: '', is_correct: false },
+          { id: 'D', text: '', is_correct: false },
+        ]
+        sec.innerHTML = `
+          <label class="block text-sm font-medium text-gray-700 mb-2">Answer Options <span class="text-gray-400 font-normal">(select the correct one)</span></label>
+          <div class="space-y-2" id="mcqOpts">
+            ${opts.map(o => `
+              <div class="flex items-center gap-3">
+                <input type="radio" name="correct" value="${o.id}" ${o.is_correct ? 'checked' : ''} class="w-4 h-4 accent-indigo-600" />
+                <span class="w-5 text-sm font-bold text-gray-500">${o.id}.</span>
+                <input type="text" value="${o.text}" placeholder="Option ${o.id}" class="inp" id="opt${o.id}" />
+              </div>`).join('')}
+          </div>
+          <p class="text-xs text-gray-400 mt-1">Click the radio button next to the correct answer.</p>`
+
+      } else if (type === 'true_false') {
+        sec.innerHTML = `
+          <label class="block text-sm font-medium text-gray-700 mb-1">Correct Answer</label>
+          <select id="fAnswer" class="inp" style="max-width:200px">
+            <option value="">Select…</option>
+            <option value="True"  ${q?.correct_answer === 'True'  ? 'selected' : ''}>True</option>
+            <option value="False" ${q?.correct_answer === 'False' ? 'selected' : ''}>False</option>
+          </select>`
+
+      } else if (['short_answer', 'essay', 'fill_blank'].includes(type)) {
+        const label = type === 'fill_blank' ? 'Correct word / phrase for the blank' : 'Model answer / answer key'
+        sec.innerHTML = `
+          <label class="block text-sm font-medium text-gray-700 mb-1">${label}</label>
+          <textarea id="fAnswer" rows="${type === 'essay' ? 5 : 2}" class="inp resize-y" placeholder="${type === 'fill_blank' ? 'e.g. melting' : 'Expected answer…'}">${q?.correct_answer || ''}</textarea>`
+
+      } else {
+        sec.innerHTML = ''
+      }
+    }
+
+    async function updateCode() {
+      if (editId) return // Don't overwrite code in edit mode
+      const subject = document.getElementById('fSubject').value
+      const grade   = document.getElementById('fGrade').value
+      if (!subject || !grade) return
+
+      const prefix = subject.replace('_','').slice(0,4).toUpperCase() + '-G' + grade + '-'
+      const { data } = await db.from('questions').select('question_code').ilike('question_code', prefix + '%')
+      const nums = (data || []).map(r => parseInt(r.question_code.split('-').pop()) || 0)
+      const next = (Math.max(0, ...nums) + 1).toString().padStart(3, '0')
+      document.getElementById('fCode').value = prefix + next
+    }
+
+    async function saveQuestion() {
+      const btn = document.getElementById('saveBtn')
+      btn.disabled = true
+      btn.textContent = 'Saving…'
+
+      const type    = document.getElementById('fType').value
+      const code    = document.getElementById('fCode').value.trim()
+      const title   = document.getElementById('fTitle').value.trim()
+      const content = document.getElementById('fContent').value.trim()
+      const subject = document.getElementById('fSubject').value
+      const grade   = document.getElementById('fGrade').value
+      const diff    = parseInt(document.getElementById('fDifficulty').value)
+
+      if (!code || !title || !content || !subject || !grade || !diff || !type) {
+        showError('Please fill in all required fields.')
+        btn.disabled = false; btn.textContent = '💾 Save Question'; return
+      }
+
+      let options       = null
+      let correctAnswer = ''
+
+      if (type === 'multiple_choice') {
+        const radios = document.querySelectorAll('input[name="correct"]')
+        let correctId = ''
+        radios.forEach(r => { if (r.checked) correctId = r.value })
+        options = ['A','B','C','D'].map(id => ({
+          id,
+          text:       document.getElementById('opt' + id)?.value || '',
+          is_correct: id === correctId
+        }))
+        correctAnswer = correctId
+      } else {
+        correctAnswer = document.getElementById('fAnswer')?.value || ''
+      }
+
+      const payload = {
+        question_code:        code.toUpperCase(),
+        title,
+        content,
+        question_type:        type,
+        subject,
+        grade_level:          grade,
+        difficulty:           diff,
+        options:              options,
+        correct_answer:       correctAnswer,
+        explanation:          document.getElementById('fExplanation').value.trim(),
+        curriculum_reference: document.getElementById('fCurriculum').value.trim(),
+        tags:                 document.getElementById('fTags').value.split(',').map(t => t.trim()).filter(Boolean),
+        updated_by:           currentUser.id,
+      }
+
+      let error
+      if (editId) {
+        const res = await db.from('questions').update(payload).eq('id', editId)
+        error = res.error
+      } else {
+        payload.created_by = currentUser.id
+        const res = await db.from('questions').insert(payload)
+        error = res.error
+      }
+
+      if (error) {
+        showError(error.message)
+        btn.disabled = false; btn.textContent = '💾 Save Question'; return
+      }
+
+      window.location.href = 'questions.html'
+    }
+
+    async function deleteQuestion() {
+      if (!confirm('Remove this question from the bank? This cannot be undone easily.')) return
+      const { error } = await db.from('questions').update({ is_active: false }).eq('id', editId)
+      if (error) { alert('Failed: ' + error.message); return }
+      window.location.href = 'questions.html'
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg')
+      el.textContent = msg
+      el.classList.remove('hidden')
+      el.scrollIntoView({ behavior: 'smooth' })
+    }
+
+    init()
+  </script>
+</body>
+</html>
