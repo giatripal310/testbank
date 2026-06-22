@@ -108,10 +108,10 @@ function navHTML(active) {
   }
   return `
   <nav style="background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:40;font-family:'Inter',system-ui,sans-serif">
-    <div style="max-width:1280px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between">
+    <div style="max-width:1280px;margin:0 auto;padding:0 24px;height:72px;display:flex;align-items:center;justify-content:space-between">
       <a href="dashboard.html" style="text-decoration:none;display:flex;align-items:center;gap:10px">
-        <img src="logo.png" alt="Prinberk Academy" style="height:55px;width:auto" />
-        <span style="font-weight:800;color:#1a3263;font-size:1.125rem;letter-spacing:-.02em;line-height:1">TestBank</span>
+        <img src="logo.png" alt="Prinberk Academy" style="height:69px;width:auto" />
+        <span style="font-weight:800;color:#1a3263;font-size:1.4rem;letter-spacing:-.02em;line-height:1">TestBank</span>
       </a>
       <div class="hidden md:flex" style="align-items:center;gap:1px">
         ${links.map(l => lnk(l.href, l.label)).join('')}
