@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────
 const SUPABASE_URL      = 'https://rlrmumjiuiumpdqdlura.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJscm11bWppdWl1bXBkcWRsdXJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MDQ0MzMsImV4cCI6MjA5NzM4MDQzM30.EUGNQ1DFWy6PEkc0SPArsidPZrORdp6ENBlIABC1Jg4'
-const AI_WORKER_URL     = 'YOUR-CLOUDFLARE-WORKER-URL'   // set up after Cloudflare step
+const AI_WORKER_URL     = 'https://testbank.giatripal310.workers.dev/'   // set up after Cloudflare step
 // ─────────────────────────────────────────────
 
 const { createClient } = supabase
